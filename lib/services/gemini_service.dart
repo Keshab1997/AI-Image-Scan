@@ -175,7 +175,45 @@ JSON ফরম্যাট:
     if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
       cleaned = cleaned.substring(firstBrace, lastBrace + 1);
     }
+
+    // Fix invalid escape sequences inside JSON string values
+    cleaned = _fixInvalidEscapes(cleaned);
     return cleaned;
+  }
+
+  String _fixInvalidEscapes(String input) {
+    final buffer = StringBuffer();
+    bool inString = false;
+    bool escaped = false;
+    const validEscapes = {'"', '\\', '/', 'b', 'f', 'n', 'r', 't', 'u'};
+
+    for (int i = 0; i < input.length; i++) {
+      final ch = input[i];
+      if (escaped) {
+        if (inString && !validEscapes.contains(ch)) {
+          buffer.write('\\\\'); // replace bad escape with literal backslash
+        } else {
+          buffer.write('\\');
+        }
+        buffer.write(ch);
+        escaped = false;
+      } else if (ch == '\\') {
+        escaped = true;
+      } else {
+        if (ch == '"' && !escaped) inString = !inString;
+        // replace raw newlines/tabs inside strings
+        if (inString && ch == '\n') {
+          buffer.write('\\n');
+        } else if (inString && ch == '\r') {
+          buffer.write('\\r');
+        } else if (inString && ch == '\t') {
+          buffer.write('\\t');
+        } else {
+          buffer.write(ch);
+        }
+      }
+    }
+    return buffer.toString();
   }
 
   Future<List<MCQQuestion>> extractMCQFromImageFile(File imageFile) async {
