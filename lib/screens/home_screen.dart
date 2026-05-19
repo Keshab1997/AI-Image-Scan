@@ -12,6 +12,7 @@ import 'result_screen.dart';
 import 'study_class_screen.dart';
 import 'quiz_screen.dart';
 import 'history_screen.dart';
+import '../services/auth_service.dart';
 
 enum ScanMode { mcq, study, quiz }
 
@@ -295,6 +296,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                     const Text('ছবি থেকে MCQ বিশ্লেষণ', style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
                   ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () async => await AuthService.signOut(),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.cardDark,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.divider),
+                  ),
+                  child: const Icon(Icons.logout_rounded, color: AppTheme.textSecondary, size: 20),
                 ),
               ),
             ],

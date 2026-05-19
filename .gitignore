@@ -49,3 +49,6 @@ app.*.map.json
 
 # VS Code with secrets
 .vscode/launch.json
+
+# Firebase
+android/app/google-services.json
