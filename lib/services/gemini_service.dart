@@ -101,7 +101,7 @@ JSON ফরম্যাট:
 
   GeminiService({required String apiKey})
       : _model = GenerativeModel(
-          model: 'gemini-1.5-flash',
+          model: 'gemini-2.5-flash-preview-05-20',
           apiKey: apiKey,
           generationConfig: GenerationConfig(
             temperature: 0.2,
