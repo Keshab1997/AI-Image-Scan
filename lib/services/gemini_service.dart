@@ -101,13 +101,13 @@ JSON ফরম্যাট:
 
   GeminiService({required String apiKey})
       : _model = GenerativeModel(
-          model: 'gemini-3-flash-preview',
+          model: 'gemini-2.0-flash',
           apiKey: apiKey,
           generationConfig: GenerationConfig(
             temperature: 0.2,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 8192,
+            maxOutputTokens: 65536,
           ),
         );
 
@@ -146,8 +146,19 @@ JSON ফরম্যাট:
         ])
       ];
 
-      final response = await _model.generateContent(content);
-      final responseText = response.text ?? '';
+      String responseText = '';
+      for (int attempt = 1; attempt <= 3; attempt++) {
+        final response = await _model.generateContent(content);
+        responseText = response.text ?? '';
+        // check if JSON is complete
+        final trimmed = responseText.trim();
+        final lastBrace = trimmed.lastIndexOf('}');
+        if (lastBrace != -1 && trimmed.substring(lastBrace).trim() == '}') {
+          break; // complete response
+        }
+        if (attempt == 3) throw Exception('AI response বারবার অসম্পূর্ণ আসছে, আবার চেষ্টা করুন।');
+      }
+
       final cleaned = _cleanResponse(responseText);
       final json = jsonDecode(cleaned);
       return parser(json);
